@@ -1,8 +1,38 @@
 // types.ts
 
+import React from 'react';
 import mongoose from 'mongoose';
 
+// Типы для компонентов
+export interface AnimatedContentProps {
+    children: React.ReactNode;
+    isLogin: boolean;
+}
 
+// Если у вас есть пропсы для AuthForm
+export interface AuthFormProps {
+    // Добавьте здесь поля, если необходимо
+}
+
+// Типы для моделей (если используете TypeScript на сервере)
+export interface IUser {
+    name: string;
+    email: string;
+    password: string;
+    avatar?: string;
+}
+
+export interface IChat {
+    participants: string[]; // или ObjectId[], если используете Mongoose
+    messages: string[];     // или ObjectId[]
+}
+
+export interface IMessage {
+    sender: string;   // или ObjectId
+    content: string;
+    chat: string;     // или ObjectId
+    timestamp: Date;
+}
 
 export interface ChatPreview {
     id: string;
@@ -49,7 +79,7 @@ export interface SearchResult {
     matchCount: number;
 }  
 
-// models type
+// src/types/user.types.ts
 export type UserStatus = 'online' | 'offline' | 'busy' | 'vacation';
 export type ThemeType = 'light' | 'dark' | 'pink';
 export type FontSize = 'normal' | 'large' | 'larger';
