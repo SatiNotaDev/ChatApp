@@ -1,5 +1,4 @@
 import mongoose, { Document, Model } from 'mongoose';
-import bcrypt from 'bcryptjs';
 import {IUserStatus} from '@/types'
 
 const userStatusSchema = new mongoose.Schema<IUserStatus>({
