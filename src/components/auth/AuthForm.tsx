@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, Suspense } from "react";
+import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import {
   Card,
@@ -11,8 +12,8 @@ import {
   CardTitle
 } from '@/components/ui/card';
 import { Button } from "@/components/ui/button";
+import { useAuth } from '@/hooks/useAuth';
 import LoginForm from './LoginForm';
-
 
 const RegisterForm = dynamic(() => import('./RegisterForm'), {
   loading: () => (
@@ -27,8 +28,45 @@ const RegisterForm = dynamic(() => import('./RegisterForm'), {
 
 const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const { login, register } = useAuth();
+  const router = useRouter();
+
+  const toggleForm = () => {
+    setIsLogin(!isLogin);
+    setError(null);
+  };
+
+  const handleSubmit = async (formData: { email: string; password: string; name?: string }) => {
+    try {
+      setError(null);
+      setLoading(true);
   
-  const toggleForm = () => setIsLogin(!isLogin);
+      if (isLogin) {
+        console.log('Logging in...');
+        await login({ email: formData.email, password: formData.password });
+      } else {
+        if (!formData.name) {
+          throw new Error('Name is required');
+        }
+  
+        console.log('Registering user...');
+        await register({ name: formData.name, email: formData.email, password: formData.password });
+        
+        console.log('Logging in after registration...');
+        await login({ email: formData.email, password: formData.password });
+      }
+  
+      console.log('Redirecting to /chats...');
+      router.push('/chats');
+    } catch (err: any) {
+      console.error('Error during authentication:', err.message);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100" suppressHydrationWarning>
@@ -43,6 +81,11 @@ const AuthForm = () => {
                 ? 'Sign in to your account' 
                 : 'Create a new account'}
             </CardDescription>
+            {error && (
+              <div className="text-sm text-red-500 mt-2">
+                {error}
+              </div>
+            )}
           </CardHeader>
           
           <CardContent>
@@ -53,21 +96,31 @@ const AuthForm = () => {
               </div>
             }>
               {isLogin ? (
-                <LoginForm />
+                <LoginForm onSubmit={handleSubmit} />
               ) : (
-                <RegisterForm />
+                <RegisterForm onSubmit={handleSubmit} />
               )}
             </Suspense>
           </CardContent>
 
           <CardFooter className="flex flex-col space-y-4">
-            <Button className="w-full">
-              {isLogin ? 'Sign In' : 'Create Account'}
+            <Button 
+              className="w-full"
+              onClick={() => {
+                const form = document.querySelector('form');
+                if (form) form.requestSubmit();
+              }}
+              disabled={loading}
+            >
+              {loading 
+                ? 'Processing...' 
+                : (isLogin ? 'Sign In' : 'Create Account')}
             </Button>
             <Button 
-              variant="ghost" 
+              variant="ghost"
               className="w-full"
               onClick={toggleForm}
+              disabled={loading}
             >
               {isLogin 
                 ? "Don't have an account? Register" 

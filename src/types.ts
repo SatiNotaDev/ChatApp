@@ -105,3 +105,25 @@ export interface IUserSettings extends Document {
   notifications: boolean;
   sound: boolean;
 }
+
+export interface Mongoose {
+    conn: typeof mongoose | null;
+    promise: Promise<typeof mongoose> | null;
+  }
+  
+export interface LoginData {
+    email: string;
+    password: string;
+  }
+  
+export interface RegisterData extends LoginData {
+    name: string;
+  }
+
+export  interface LoginFormProps {
+    onSubmit: (data: { email: string; password: string }) => Promise<void>;
+  }
+  
+export interface RegisterFormProps {
+  onSubmit: (data: { name: string; email: string; password: string }) => Promise<void>;
+}
