@@ -127,3 +127,8 @@ export  interface LoginFormProps {
 export interface RegisterFormProps {
   onSubmit: (data: { name: string; email: string; password: string }) => Promise<void>;
 }
+
+export interface UserData {
+  name: string;
+  status: 'online' | 'offline' | 'busy' | 'vacation';
+}

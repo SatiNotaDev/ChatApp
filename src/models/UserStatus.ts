@@ -1,24 +1,27 @@
-import mongoose, { Document, Model } from 'mongoose';
-import {IUserStatus} from '@/types'
+import mongoose from 'mongoose';
 
-const userStatusSchema = new mongoose.Schema<IUserStatus>({
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-      unique: true
-    },
-    status: {
-      type: String,
-      enum: ['online', 'offline', 'busy', 'vacation'],
-      default: 'offline'
-    },
-    lastSeen: {
-      type: Date,
-      default: Date.now
-    }
-  }, {
-    timestamps: true
-  });
-  
-  export const UserStatus = mongoose.models.UserStatus || mongoose.model('UserStatus', userStatusSchema);
+export type UserStatusType = 'online' | 'offline' | 'busy' | 'vacation';
+
+const userStatusSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    unique: true
+  },
+  status: {
+    type: String,
+    enum: ['online', 'offline', 'busy', 'vacation'],
+    default: 'offline'
+  },
+  isTemporary: {
+    type: Boolean,
+    default: true
+  },
+  lastSeen: {
+    type: Date,
+    default: Date.now
+  }
+});
+
+export const UserStatus = mongoose.models.UserStatus || mongoose.model('UserStatus', userStatusSchema);

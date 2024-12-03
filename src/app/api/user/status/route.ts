@@ -1,9 +1,31 @@
 import { NextResponse } from 'next/server';
+import { verifyAuth } from '@/lib/auth';
 import { UserStatusController } from '@/controllers';
-import { verifyAuth } from '@/lib/auth'; 
+
+export async function GET(req: Request) {
+  try {
+    const userId = await verifyAuth(req);
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    const statusController = new UserStatusController();
+    const status = await statusController.getStatus(userId);
+
+    return NextResponse.json(status);
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Failed to get status' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function PUT(req: Request) {
   try {
-    // Проверяем JWT токен из cookies
     const userId = await verifyAuth(req);
     if (!userId) {
       return NextResponse.json(
@@ -14,13 +36,13 @@ export async function PUT(req: Request) {
 
     const { status } = await req.json();
     const statusController = new UserStatusController();
-    const updatedStatus = await statusController.updateStatus(userId, status);
+    const updatedStatus = await statusController.setStatus(userId, status);
 
     return NextResponse.json(updatedStatus);
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json(
-      { error: error.message || 'Failed to update status' },
-      { status: 400 }
+      { error: 'Failed to update status' },
+      { status: 500 }
     );
   }
 }
