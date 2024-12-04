@@ -1,20 +1,12 @@
-// types.ts
-
 import React from 'react';
 import mongoose from 'mongoose';
 
-// Типы для компонентов
+
 export interface AnimatedContentProps {
     children: React.ReactNode;
     isLogin: boolean;
 }
 
-// Если у вас есть пропсы для AuthForm
-export interface AuthFormProps {
-    // Добавьте здесь поля, если необходимо
-}
-
-// Типы для моделей (если используете TypeScript на сервере)
 export interface IUser {
     name: string;
     email: string;
@@ -22,17 +14,6 @@ export interface IUser {
     avatar?: string;
 }
 
-export interface IChat {
-    participants: string[]; // или ObjectId[], если используете Mongoose
-    messages: string[];     // или ObjectId[]
-}
-
-export interface IMessage {
-    sender: string;   // или ObjectId
-    content: string;
-    chat: string;     // или ObjectId
-    timestamp: Date;
-}
 
 export interface ChatPreview {
     id: string;
@@ -54,10 +35,12 @@ export interface Message {
 }
 
 export interface Contact {
-    id: string;
-    name: string;
-    email: string;
-    isContact: boolean;
+  _id: string; 
+  name: string;
+  department: string;
+  email: string;
+  isContact: boolean; 
+  
 }
 
 export interface ContactCardProps {
@@ -79,8 +62,8 @@ export interface SearchResult {
     matchCount: number;
 }  
 
-// src/types/user.types.ts
-export type UserStatus = 'online' | 'offline' | 'busy' | 'vacation';
+
+export type UserStatusType = 'online' | 'offline' | 'busy' | 'vacation';
 export type ThemeType = 'light' | 'dark' | 'pink';
 export type FontSize = 'normal' | 'large' | 'larger';
 
@@ -94,7 +77,7 @@ export interface IUser extends Document {
 
 export interface IUserStatus extends Document {
   userId: mongoose.Types.ObjectId;
-  status: UserStatus;
+  status: UserStatusType;
   lastSeen: Date;
 }
 
@@ -131,4 +114,29 @@ export interface RegisterFormProps {
 export interface UserData {
   name: string;
   status: 'online' | 'offline' | 'busy' | 'vacation';
+}
+
+export interface Settings {
+  theme: 'light' | 'dark' | 'pink';
+  fontSize: 'normal' | 'large' | 'larger';
+  sound: boolean;
+  notifications: boolean;
+ }
+
+ export interface UserData {
+  name: string;
+  email: string;
+  status: 'online' | 'offline' | 'busy' | 'vacation';
+  theme?: 'light' | 'dark' | 'pink';
+  fontSize?: 'normal' | 'large' | 'larger';
+  sound?: boolean;
+  notifications?: boolean;
+}
+
+
+export interface IContact extends Document {
+  name: string;
+  email: string;
+  department: string;
+  createdAt: Date;
 }

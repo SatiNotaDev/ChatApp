@@ -1,5 +1,8 @@
 import mongoose from 'mongoose';
-import type {Mongoose} from '@/types'
+import type {Mongoose} from '@/types';
+
+console.log('Loaded MONGODB_URI:', process.env.MONGODB_URI);
+
 
 declare global {
   var mongoose: Mongoose | undefined;

@@ -1,18 +1,19 @@
 import { UserStatus } from '@/models';
 import { connectDB } from '@/lib/mongoose';
-import type { UserStatusType } from '@/models/UserStatus';
+import type { UserStatusType } from '@/types';
 
 export class UserStatusController {
   async setStatus(userId: string, status: UserStatusType) {
     try {
       await connectDB();
-      const isTemporary = status !== 'vacation';
+      
+      const isPermanent = status === 'vacation';
 
       const updatedStatus = await UserStatus.findOneAndUpdate(
         { userId },
         { 
           status,
-          isTemporary,
+          isPermanent,
           lastSeen: new Date()
         },
         { upsert: true, new: true }
@@ -25,24 +26,18 @@ export class UserStatusController {
     }
   }
 
-  async getStatus(userId: string) {
-    try {
-      await connectDB();
-      const status = await UserStatus.findOne({ userId });
-      return status || { status: 'offline', isTemporary: true };
-    } catch (error) {
-      console.error('Get status error:', error);
-      throw error;
-    }
-  }
-
   async handleLogin(userId: string) {
     try {
       await connectDB();
+      
+    
       const currentStatus = await UserStatus.findOne({ userId });
-      if (currentStatus?.status === 'vacation' && !currentStatus.isTemporary) {
+
+      if (currentStatus?.isPermanent) {
         return currentStatus;
       }
+
+    
       return await this.setStatus(userId, 'online');
     } catch (error) {
       console.error('Handle login error:', error);
@@ -53,10 +48,16 @@ export class UserStatusController {
   async handleLogout(userId: string) {
     try {
       await connectDB();
-      const currentStatus = await UserStatus.findOne({ userId })
-      if (currentStatus?.status === 'vacation' && !currentStatus.isTemporary) {
+      
+     
+      const currentStatus = await UserStatus.findOne({ userId });
+
+   
+      if (currentStatus?.isPermanent) {
         return currentStatus;
       }
+
+  
       return await this.setStatus(userId, 'offline');
     } catch (error) {
       console.error('Handle logout error:', error);

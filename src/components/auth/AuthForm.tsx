@@ -9,7 +9,7 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from '@/components/ui/card';
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/hooks/useAuth';
@@ -69,7 +69,7 @@ const AuthForm = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100" suppressHydrationWarning>
+    <div className="flex items-center justify-center min-h-screen" suppressHydrationWarning>
       <div className="w-full max-w-md">
         <Card>
           <CardHeader>

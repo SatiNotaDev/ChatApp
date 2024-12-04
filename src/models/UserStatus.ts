@@ -1,7 +1,5 @@
 import mongoose from 'mongoose';
 
-export type UserStatusType = 'online' | 'offline' | 'busy' | 'vacation';
-
 const userStatusSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -14,9 +12,9 @@ const userStatusSchema = new mongoose.Schema({
     enum: ['online', 'offline', 'busy', 'vacation'],
     default: 'offline'
   },
-  isTemporary: {
+  isPermanent: {    
     type: Boolean,
-    default: true
+    default: false 
   },
   lastSeen: {
     type: Date,

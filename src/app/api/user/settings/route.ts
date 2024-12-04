@@ -1,52 +1,53 @@
-// src/app/api/user/settings/route.ts
 import { NextResponse } from 'next/server';
-import { UserSettingsController } from '@/controllers';
+import { connectDB } from '@/lib/mongoose';
+import { UserSettings } from '@/models';
 import { verifyAuth } from '@/lib/auth';
 
-export async function PUT(req: Request) {
-  try {
-    const userId = await verifyAuth(req);
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
+export async function GET(req: Request) {
+ try {
+   const userId = await verifyAuth(req);
+   if (!userId) {
+     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+   }
 
-    const settings = await req.json();
-    const settingsController = new UserSettingsController();
-    const updatedSettings = await settingsController.updateSettings(
-      userId,
-      settings
-    );
+   await connectDB();
+   const settings = await UserSettings.findOne({ userId });
 
-    return NextResponse.json(updatedSettings);
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Failed to update settings' },
-      { status: 400 }
-    );
-  }
+   return NextResponse.json(settings || {
+     theme: 'light',
+     fontSize: 'normal',
+     sound: true,
+     notifications: true
+   });
+ } catch (error) {
+   return NextResponse.json(
+     { error: 'Failed to fetch settings' },
+     { status: 500 }
+   );
+ }
 }
 
-export async function GET(req: Request) {
-  try {
-    const userId = await verifyAuth(req);
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
+export async function PUT(req: Request) {
+ try {
+   const userId = await verifyAuth(req);
+   if (!userId) {
+     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+   }
 
-    const settingsController = new UserSettingsController();
-    const settings = await settingsController.getSettings(userId);
+   const updates = await req.json();
+   await connectDB();
 
-    return NextResponse.json(settings);
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch settings' },
-      { status: 400 }
-    );
-  }
+   const settings = await UserSettings.findOneAndUpdate(
+     { userId },
+     { $set: updates },
+     { new: true, upsert: true }
+   );
+
+   return NextResponse.json(settings);
+ } catch (error) {
+   return NextResponse.json(
+     { error: 'Failed to update settings' },
+     { status: 500 }
+   );
+ }
 }

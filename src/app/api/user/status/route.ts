@@ -1,24 +1,25 @@
 import { NextResponse } from 'next/server';
+import { connectDB } from '@/lib/mongoose';
+import { UserStatus } from '@/models/UserStatus';
 import { verifyAuth } from '@/lib/auth';
-import { UserStatusController } from '@/controllers';
 
 export async function GET(req: Request) {
   try {
     const userId = await verifyAuth(req);
     if (!userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const statusController = new UserStatusController();
-    const status = await statusController.getStatus(userId);
+    await connectDB();
+    const status = await UserStatus.findOne({ userId });
 
-    return NextResponse.json(status);
+    return NextResponse.json({
+      status: status?.status || 'vacation'
+    });
   } catch (error) {
+    console.error('Failed to fetch user status:', error);
     return NextResponse.json(
-      { error: 'Failed to get status' },
+      { error: 'Failed to fetch user status' },
       { status: 500 }
     );
   }
@@ -28,20 +29,23 @@ export async function PUT(req: Request) {
   try {
     const userId = await verifyAuth(req);
     if (!userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { status } = await req.json();
-    const statusController = new UserStatusController();
-    const updatedStatus = await statusController.setStatus(userId, status);
+    await connectDB();
 
-    return NextResponse.json(updatedStatus);
+    await UserStatus.findOneAndUpdate(
+      { userId },
+      { status, lastSeen: new Date(), isTemporary: status !== 'vacation' },
+      { upsert: true }
+    );
+
+    return NextResponse.json({ status });
   } catch (error) {
+    console.error('Failed to update user status:', error);
     return NextResponse.json(
-      { error: 'Failed to update status' },
+      { error: 'Failed to update user status' },
       { status: 500 }
     );
   }
