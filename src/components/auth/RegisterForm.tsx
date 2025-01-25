@@ -3,15 +3,15 @@
 import { Input } from '@/components/ui/input';
 import { Label } from "@/components/ui/label";
 import { useState } from 'react';
-import type {RegisterFormProps} from '@/types'
+import type { RegisterFormProps } from '@/types'
 
 export default function RegisterForm({ onSubmit }: RegisterFormProps) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
-  });
+    confirmPassword: '',
+    department: ''  });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,13 +34,14 @@ export default function RegisterForm({ onSubmit }: RegisterFormProps) {
       <div className="space-y-2">
         <Label htmlFor="name">Name</Label>
         <Input 
-          id="name" 
+          id="name"
           value={formData.name}
           onChange={handleChange}
-          placeholder="Enter your name" 
-          required 
+          placeholder="Enter your name"
+          required
         />
       </div>
+
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input
@@ -52,6 +53,18 @@ export default function RegisterForm({ onSubmit }: RegisterFormProps) {
           required
         />
       </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="department">Department</Label>
+        <Input
+          id="department"
+          value={formData.department}
+          onChange={handleChange}
+          placeholder="Enter your department"
+          required
+        />
+      </div>
+
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
         <Input
@@ -63,6 +76,7 @@ export default function RegisterForm({ onSubmit }: RegisterFormProps) {
           required
         />
       </div>
+
       <div className="space-y-2">
         <Label htmlFor="confirmPassword">Confirm Password</Label>
         <Input

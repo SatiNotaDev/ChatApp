@@ -24,7 +24,6 @@ const contactSchema = new mongoose.Schema({
   }
 });
 
-
 const userContactsSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,

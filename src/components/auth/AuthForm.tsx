@@ -15,6 +15,13 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from '@/hooks/useAuth';
 import LoginForm from './LoginForm';
 
+interface AuthFormData {
+  email: string;
+  password: string;
+  name?: string;
+  department?: string;
+}
+
 const RegisterForm = dynamic(() => import('./RegisterForm'), {
   loading: () => (
     <div className="space-y-4 animate-pulse">
@@ -38,7 +45,7 @@ const AuthForm = () => {
     setError(null);
   };
 
-  const handleSubmit = async (formData: { email: string; password: string; name?: string }) => {
+  const handleSubmit = async (formData: AuthFormData) => {
     try {
       setError(null);
       setLoading(true);
@@ -47,12 +54,17 @@ const AuthForm = () => {
         console.log('Logging in...');
         await login({ email: formData.email, password: formData.password });
       } else {
-        if (!formData.name) {
-          throw new Error('Name is required');
+        if (!formData.name || !formData.department) {
+          throw new Error('Name and department are required');
         }
   
         console.log('Registering user...');
-        await register({ name: formData.name, email: formData.email, password: formData.password });
+        await register({ 
+          name: formData.name, 
+          email: formData.email, 
+          password: formData.password,
+          department: formData.department 
+        });
         
         console.log('Logging in after registration...');
         await login({ email: formData.email, password: formData.password });

@@ -67,12 +67,12 @@ export type UserStatusType = 'online' | 'offline' | 'busy' | 'vacation';
 export type ThemeType = 'light' | 'dark' | 'pink';
 export type FontSize = 'normal' | 'large' | 'larger';
 
-export interface IUser extends Document {
+export interface IUser {
   name: string;
   email: string;
   password: string;
-  avatar?: string;
-  comparePassword(candidatePassword: string): Promise<boolean>;
+  department: string;
+  comparePassword?: (candidatePassword: string) => Promise<boolean>;
 }
 
 export interface IUserStatus extends Document {
@@ -101,6 +101,7 @@ export interface LoginData {
   
 export interface RegisterData extends LoginData {
     name: string;
+    department: string;
   }
 
 export  interface LoginFormProps {

@@ -1,5 +1,5 @@
-import { User, UserStatus, UserSettings } from '@/models/index';
-import {connectDB} from '@/lib/mongoose'
+import { User, UserStatus, UserSettings, Contact, UserContacts } from '@/models/index';
+import { connectDB } from '@/lib/mongoose';
 import { IUser } from '@/types';
 
 export class RegisterController {
@@ -32,6 +32,28 @@ export class RegisterController {
         notifications: true,
         sound: true,
       });
+
+  
+      console.log('Creating contact entry...');
+      const newContact = await Contact.create({
+        name: userData.name,
+        email: userData.email,
+        department: userData.department,
+        createdAt: new Date()
+      });
+
+
+      console.log('Creating user contacts entry...');
+      await UserContacts.create({
+        userId: user._id,
+        contactIds: [] 
+      });
+
+      console.log('Adding contact to all users...');
+      await UserContacts.updateMany(
+        { userId: { $ne: user._id } },
+        { $addToSet: { contactIds: newContact._id } }
+      );
 
       console.log('User registered successfully:', user);
       const { password, ...userWithoutPassword } = user.toObject();
