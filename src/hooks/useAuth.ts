@@ -13,13 +13,12 @@ export function useAuth() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
-
-      if (!loginResponse.ok) {
-        const error = await loginResponse.json();
-        throw new Error(error.message || 'Login failed');
-      }
-
+  
       const userData = await loginResponse.json();
+  
+      if (!loginResponse.ok) {
+        throw new Error(userData.error || 'Login failed');
+      }
 
       const statusResponse = await fetch('/api/user/status');
       const currentStatus = await statusResponse.json();
@@ -34,38 +33,39 @@ export function useAuth() {
 
       router.refresh();
       return userData;
-    } catch (error: any) {
-      throw new Error(error.message || 'Login failed');
-    }
+  } catch (error: any) {
+    throw new Error(error.message || 'Login failed');
+  }
   };
 
-  const register = async (data: RegisterData) => {
-    try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Registration failed');
-      }
+const register = async (data: RegisterData) => {
+  try {
+    const response = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
 
-      const userData = await response.json();
+    const responseData = await response.json();
 
-      await fetch('/api/user/status', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'online' }),
-      });
-
-      router.refresh();
-      return userData;
-    } catch (error: any) {
-      throw new Error(error.message || 'Registration failed');
+    if (!response.ok) {
+      throw new Error(responseData.error || 'Registration failed');
     }
-  };
+
+    await fetch('/api/user/status', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'online' }),
+    });
+
+    router.refresh();
+    return responseData;
+  } catch (error: any) {
+    console.error('Registration client error:', error);
+    throw new Error(error.message || 'Registration failed');
+  }
+};
 
   const logout = async () => {
     try {

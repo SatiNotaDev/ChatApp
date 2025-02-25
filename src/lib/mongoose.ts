@@ -1,26 +1,19 @@
 import mongoose from 'mongoose';
-import type {Mongoose} from '@/types';
 
-console.log('Loaded MONGODB_URI:', process.env.MONGODB_URI);
-
-
-declare global {
-  var mongoose: Mongoose | undefined;
+interface Mongoose {
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
 }
+
+const cached: Mongoose = {
+  conn: null,
+  promise: null,
+};
 
 const MONGODB_URI = process.env.MONGODB_URI as string;
 
 if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable');
-}
-
-const cached: Mongoose = global.mongoose || {
-  conn: null,
-  promise: null,
-};
-
-if (!global.mongoose) {
-  global.mongoose = cached;
 }
 
 export async function connectDB(): Promise<typeof mongoose> {
@@ -32,8 +25,7 @@ export async function connectDB(): Promise<typeof mongoose> {
     const opts = {
       bufferCommands: false,
     };
-
-    cached.promise = mongoose.connect(MONGODB_URI);
+    cached.promise = mongoose.connect(MONGODB_URI, opts);
   }
 
   try {

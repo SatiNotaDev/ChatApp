@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server';
-import { RegisterController } from '@/controllers';
+import { RegisterController } from "@/controllers";
+import { NextResponse } from "next/server";
+
 
 export async function POST(req: Request) {
   try {
@@ -9,6 +10,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(user, { status: 201 });
   } catch (error: any) {
+    console.error('Registration server error:', error);
     return NextResponse.json(
       { error: error.message || 'Registration failed' },
       { status: 400 }
